@@ -1,7 +1,9 @@
 fn main() {
     let aa = a::get_ans_one();
+    let ab = a::get_ans_two();
 
     println!("Answer 1: {}", aa);
+    println!("Answer 2: {}", ab);
 }
 
 mod a {
@@ -10,13 +12,40 @@ mod a {
     pub fn get_ans_one() -> i64 {
         let p1 = "1,1,1,4,99,5,6,0,99";
         let p2 ="1,9,10,3,2,3,11,0,99,30,40,50";
-        let p3 = get_input();
-        let mut p = Intcode::Program::fromstring(String::from(p3));
-        p.pretty_print();
-        p.evaluate();
-        p.pretty_print();
+        let mut p3 = get_input();
+        remove_whitespace(&mut p3);
 
-        0
+        let mut p = Intcode::Program::fromstring(String::from(p3));
+
+        p.problem_one()
+    }
+    pub fn get_ans_two() -> i64 {
+        // what pair of inputs produces 19690720
+        //  inputs replace addrs 1 and 2
+        //                  noun    verb
+        //                  each b/t 0 99 inclusive
+        // output at addr 0
+        //
+        // make sure aech time try input, reset mem to beginning
+        //
+        // return 100 * noun * verb
+        let mut prog_string = get_input();
+        remove_whitespace(&mut prog_string);
+        for i in 0..99+1 {
+            for j in 0..99+1 {
+                if Intcode::Program::new_evaluate_inputs(
+                    prog_string.clone(), i, j) == 19690720 {
+                    return 100 * i + j
+                } else {}
+            }
+        }
+
+        1
+    }
+
+      //s.retain(|c| !c.is_whitespace());
+    fn remove_whitespace(s: &mut String) {
+        s.retain(|c| !c.is_whitespace())
     }
 
     fn get_input() -> String {
@@ -43,6 +72,12 @@ pub mod Intcode {
                 .map(|f| { f.parse::<isize>().expect("Uh oh parsing program")})
                 .collect::<Vec<isize>>();
             Program { the_program: int_list.clone() }
+        }
+        pub fn new_evaluate_inputs(s: String, a: i64, b: i64) -> i64 {
+            let mut prog = Program::fromstring(s);
+            prog.the_program[1] = a as isize; prog.the_program[2] = b as isize;
+            prog.evaluate();
+            prog.the_program[0] as i64
         }
         pub fn pretty_print(&self) {
             // 4 ints per line
@@ -80,6 +115,14 @@ pub mod Intcode {
                 }
                 if i >= p.len() { panic!("past end of prog") } else {}
             }
+        }
+        pub fn problem_one(&mut self) -> i64 {
+            self.the_program[1] = 12;
+            self.the_program[2] = 2;
+
+            self.evaluate();
+
+            self.the_program[0] as i64
         }
     }
 }
