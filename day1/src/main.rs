@@ -19,10 +19,8 @@ mod a {
                     Err(_) => { String::from("no") }
                 }
             }
-
         }
     }
-        //fs::read_to_string("input.txt").expect("Couldn't read file")}
 
     fn calculate_the_fuel(stringput: String) -> i64 {
         let mut total_fuel = 0i64;
@@ -42,10 +40,9 @@ mod a {
                 Ok(i) => {
                     let mut j = i;
                     loop {
-                        if j <= 0 { break; } else {}
-
-                        total_fuel += j;
                         j = fuel_for_mass(j);
+                        if j <= 0 { break; } else {}
+                        total_fuel += j;
                     }
                 },
             }
